@@ -3,9 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Comment;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -20,13 +22,22 @@ class CommentCrudController extends AbstractCrudController
     
     public function configureFields(string $pageName): iterable
     {
-        return [
-            AssociationField::new('conference'),
-            TextField::new('author'),
-            EmailField::new('email'),
-            TextareaField::new('text')->hideOnIndex(),
-            TextField::new('photoFilename'),
-        ];
+
+            yield AssociationField::new('conference');
+            yield TextField::new('author');
+            yield EmailField::new('email');
+            yield TextareaField::new('text')->hideOnIndex();
+            yield TextField::new('photoFilename');
+            $createdAt = DateTimeField::new('createdAt')->setFormTypeOptions([
+                    'html5' => true,
+                    'years' => range(date('Y'), date('Y') + 5),
+                    'widget' => 'single_text',
+                ]);
+                if (Crud::PAGE_EDIT === $pageName) {
+                    yield $createdAt->setFormTypeOption('disabled', true);
+                } else {
+                    yield $createdAt;
+                }
     }
     
     /*
